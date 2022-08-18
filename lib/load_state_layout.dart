@@ -42,6 +42,7 @@ class LoadStateLayout extends StatefulWidget {
   final Widget? loadingView; //loading视图
   final Widget? errorWidget; //错误视图
   final Widget? emptyWidget; //空视图
+  final VoidCallback? emptyRetry; //空事件处理
   final VoidCallback? errorRetry; //错误事件处理
 
   const LoadStateLayout({
@@ -51,6 +52,7 @@ class LoadStateLayout extends StatefulWidget {
     this.loadingView,
     this.errorWidget,
     this.emptyWidget,
+    this.emptyRetry,
     this.errorRetry,
   }) : super(key: key);
 
@@ -75,9 +77,17 @@ class _LoadStateLayoutState extends State<LoadStateLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: _buildWidget,
-    );
+    return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (widget.layoutController.layoutState == LayoutState.error) {
+            widget.errorRetry?.call();
+          }
+          if (widget.layoutController.layoutState == LayoutState.empty) {
+            widget.emptyRetry?.call();
+          }
+        },
+        child: _buildWidget);
   }
 
   ///根据不同状态来显示不同的视图
@@ -122,17 +132,13 @@ class _LoadStateLayoutState extends State<LoadStateLayout> {
       height: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          const Icon(Icons.network_wifi, color: Colors.green),
-          const Text("网络错误"),
-          MaterialButton(
-            color: const Color(0xffbc2929),
-            onPressed: widget.errorRetry,
-            child: const Text(
-              '刷新',
-              style: TextStyle(color: Colors.white),
-            ),
-          )
+        children: const <Widget>[
+          Icon(Icons.network_wifi, color: Colors.green),
+          Text("网络错误"),
+          Text(
+            '刷新',
+            style: TextStyle(color: Colors.white),
+          ),
         ],
       ),
     );

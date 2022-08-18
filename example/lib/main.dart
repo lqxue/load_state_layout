@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage>
               errorRetry: () {
                 layoutController.layoutState = LayoutState.loading;
               }, //错误按钮点击过后进行重新加载
-              successWidget: const Text("正文"),
+              successWidget: const SizedBox(width:500,height:200,child: Text("正文")),
             ),
           ),
         ],
