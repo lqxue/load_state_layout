@@ -95,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage>
           ),
           Expanded(
             child: LoadStateLayout(
+              layoutStyle: LayoutStyle.stack,
               layoutController: layoutController,
               errorRetry: () {
                 layoutController.layoutState = LayoutState.loading;

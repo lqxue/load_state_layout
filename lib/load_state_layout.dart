@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 /// 描述：四种视图状态
 enum LayoutState { success, error, loading, empty }
 
+///布局样式
+enum LayoutStyle { only, stack }
+
 ///布局控制器
 class LayoutController extends ChangeNotifier {
   LayoutState _layoutState;
@@ -38,6 +41,7 @@ class LayoutController extends ChangeNotifier {
 ///根据不同状态来展示不同的视图
 class LoadStateLayout extends StatefulWidget {
   final LayoutController layoutController; //页面状态
+  final LayoutStyle? layoutStyle; //设置布局样式
   final Widget successWidget; //成功视图
   final Widget? loadingView; //loading视图
   final Widget? errorWidget; //错误视图
@@ -49,6 +53,7 @@ class LoadStateLayout extends StatefulWidget {
     Key? key,
     required this.layoutController, //默认为加载状态
     required this.successWidget,
+    this.layoutStyle = LayoutStyle.only,
     this.loadingView,
     this.errorWidget,
     this.emptyWidget,
@@ -92,15 +97,29 @@ class _LoadStateLayoutState extends State<LoadStateLayout> {
 
   ///根据不同状态来显示不同的视图
   Widget get _buildWidget {
-    switch (widget.layoutController.layoutState) {
-      case LayoutState.error:
-        return widget.errorWidget ?? _errorView;
-      case LayoutState.loading:
-        return widget.loadingView ?? _loadingView;
-      case LayoutState.empty:
-        return widget.emptyWidget ?? _emptyView;
-      default:
-        return widget.successWidget;
+    if (widget.layoutStyle == LayoutStyle.only) {
+      switch (widget.layoutController.layoutState) {
+        case LayoutState.error:
+          return widget.errorWidget ?? _errorView;
+        case LayoutState.loading:
+          return widget.loadingView ?? _loadingView;
+        case LayoutState.empty:
+          return widget.emptyWidget ?? _emptyView;
+        default:
+          return widget.successWidget;
+      }
+    } else {
+      return Stack(
+        children: [
+          widget.successWidget,
+          if (widget.layoutController.layoutState == LayoutState.error)
+            widget.errorWidget ?? _errorView,
+          if (widget.layoutController.layoutState == LayoutState.loading)
+            widget.loadingView ?? _loadingView,
+          if (widget.layoutController.layoutState == LayoutState.empty)
+            widget.emptyWidget ?? _emptyView
+        ],
+      );
     }
   }
 
